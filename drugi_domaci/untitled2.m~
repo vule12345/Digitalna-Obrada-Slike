@@ -1,0 +1,116 @@
+clear
+close all
+clc
+
+img  = imread('ulazne_slike/lena_noise.tif');
+imshow(img)
+
+S = 15;
+K = 3;
+var = 0.007;
+h = 0.05;
+
+% Size of image
+[M, N] =  size(img);
+
+% Dimenison for padding the input image
+half_s = floor(S/2);
+half_k = floor(K/2);
+
+pad = half_s + half_k;
+
+% Padd image with zeroes
+padded_img = padarray(img,[pad, pad],0,'both');
+
+%Alocating new image
+output_image = zeros(M, N);
+
+% Weight function
+weight = zeros(1,S^2);
+
+
+% Global loop for x
+for global_x = pad+1: pad+M
+    
+    % Global loop for y
+    for global_y = pad+1: pad+N
+      
+        ref_KxK = padded_img (global_x - half_k: global_x + half_k, global_y - half_k :global_y + half_k);
+        %%%sum_ref_KxK = sum(sum(ref_KxK))/(K*K);
+        
+        Z = 0;
+        
+        S_begin_x = global_x - half_s;
+        S_begin_y = global_y - half_s;
+        
+        S_end_x = global_x + half_s; % proveri
+        S_end_y = global_y + half_s; % proveir
+        
+        s_counter = 1;
+        for S_x = S_begin_x:S_end_x 
+            for S_y = S_begin_y: S_end_y
+                
+                current_KxK = padded_img (S_x - half_k : S_x + half_k, S_y - half_k:S_y + half_k);
+                
+                %%%sum_current_KxK = sum(sum(current_KxK))/(K*K);
+                
+                mse = 1/(K*K) * sum(sum(abs(ref_KxK-current_KxK).^2));
+                
+                mse = max(mse-2*var,0)
+                
+                dist = exp(-(mse/(h*h)));
+                
+                Z = Z + dist;
+                
+                weight(s_counter) = dist * padded_img(S_x, S_y);
+                
+                s_counter = s_counter+1;
+            end    
+        end
+       
+  
+        output_image(global_x-pad, global_y-pad) = sum(weight) ./ Z;        
+        
+    end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

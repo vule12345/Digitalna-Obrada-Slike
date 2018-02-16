@@ -1,0 +1,455 @@
+% OE4DOS Second assignment 11/2017
+% Student : Vuk Vukomanovic 2014/0018
+% This script contains all sub tasks
+% Assigment : http://tnt.etf.rs/~oe4dos/Domaci_zadaci/dos1718_domaci2.pdf
+clear
+clc
+close all
+warning('off', 'images:initSize:adjustingMag')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%% Report holds explanations of why certain method were used
+% 
+% %%$ 1. Restauration image girl_print.tif. Image represents digitalized
+% % printed image.
+% disp('First part of assignment starts here')
+% 
+% % Loading image
+% girl_print = double(imread('ulazne_slike/girl_print.jpg'));
+% disp('Girl_print.jpg loaded, processing image')
+% 
+% % Showing image
+% figure
+% imshow(girl_print,[]);
+% set(gcf, 'Name', 'Ulazna slika, girl_print');
+% 
+% % Getting image size
+% [M, N] = size(girl_print);
+% 
+% % Calculating FFT of input image
+% girl_print_spectrum = fft2(girl_print);
+% 
+% % Showing image ampl spectrum
+% figure;
+% imshow(log(1 + abs(fftshift(girl_print_spectrum))),[]);
+% set(gcf, 'Name', 'Spektar ulazne slike, girl_print');
+% 
+% % Selective filtering with notch filter, cnotch funcion is used
+% 
+% % Centre points of filters
+% C1 = [60 36; 100 134; 231 104; 361 76; 404 174;495 45; 508 163; 219 26];
+% 
+% C2 = [469 65; 86 54; 465 37];
+% 
+% % Creation of filters
+% H_gaussian_big = cnotch('gaussian', 'reject', M, N, C1, 50);
+% 
+% H_gaussian_small = cnotch('gaussian', 'reject', M, N, C2, 5);
+% 
+% H_gaussian = H_gaussian_big.*H_gaussian_small;
+% 
+% % Showing filter ampl spectrum
+% figure; 
+% imshow(log(1 + abs(fftshift(H_gaussian))),[]);
+% set(gcf, 'Name', 'Spektar noc filtra');
+% 
+% % Convolution
+% filtered_spectrum_gaussian = H_gaussian.*girl_print_spectrum;
+% 
+% % Spectrum after convolution
+% figure; 
+% imshow(log(1 + abs(fftshift(filtered_spectrum_gaussian))),[]);
+% set(gcf, 'Name', 'Spektar nakon filtriranja');
+% 
+% % Inverse fft, getting back in spatial domain
+% girl_print_filtered = ifft2(filtered_spectrum_gaussian);
+% 
+% figure; 
+% imshow(uint8(girl_print_filtered));
+% set(gcf, 'Name', 'Slika nakon filtriranja');
+% disp('First part of homework ends here');
+% 
+% %%%%%%%%%%%%%%%%%%%%%
+% % In this section vercital and horizontal notch filter are added
+% % Additional filtering 
+% 
+% %Creating horizontal and vertical notch filter
+% rect_notch = ones(M,N);
+% rect_notch(403, 1:N) = 0;
+% rect_notch(1:M, 301) = 0;
+% rect_notch(1:M, 302) = 0;
+% rect_notch(1:M, 104) = 0;
+% rect_notch(1:M, 105) = 0;
+% rect_notch(139, 1:N) = 0;
+% 
+% % Show ver +hor notch filter
+% figure; 
+% imshow(rect_notch);
+% set(gcf, 'Name', 'Vertikalni i horizontalni filtar');
+% 
+% % Convolution
+% shifted_spect = fftshift(filtered_spectrum_gaussian); 
+% additinal_filter_spect = shifted_spect.*rect_notch;
+% 
+% % Show filtered spectrum
+% figure; 
+% imshow(log(1 + abs((additinal_filter_spect))),[]);
+% set(gcf, 'Name', 'Spektar nakon filtriranja + ver +hor filtar');
+% 
+% % Spatial domain
+% additional_res = ifft2(fftshift(additinal_filter_spect));
+% 
+% figure; 
+% imshow(additional_res,[]);
+% set(gcf, 'Name', 'Slika nakon filtriranja + ver +hor filtar');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% 2. Usage of funcion dos_downscale on image roof.jpg
+% disp('Second part of homework starts here')
+% house = double(imread('ulazne_slike/roof.jpg'));
+% 
+% % Resizing image by factor 2 with dos_downscale
+% smaller_house_2 = dos_downscale(house, 0.5);
+% 
+% % Resizing image by factor 4 with dos_downscale
+% smaller_house_4 = dos_downscale(house, 0.25);
+% 
+% % Resizing image by factor 7 with dos_downscale
+% smaller_house_7 = dos_downscale(house, 1/7);
+% 
+% figure; 
+% imshow(house,[]);
+% set(gcf, 'Name', 'Originalna slika, roof');
+% 
+% figure; 
+% imshow(smaller_house_2,[]);
+% set(gcf, 'Name', 'Slika nakon decimacije, dos_downscale, faktor 2');
+% 
+% figure; 
+% imshow(smaller_house_4,[]);
+% set(gcf, 'Name', 'Slika nakon decimacije, dos_downscale, faktor 4');
+% 
+% figure; 
+% imshow(smaller_house_7,[]);
+% set(gcf, 'Name', 'Slika nakon decimacije, dos_downscale, faktor 7');
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%
+% % Nearest neighbour imresize
+% 
+% % Resizing image by factor 2 with imresize('nearest')
+% smaller_house_2_im_off = imresize(house, 0.5, 'nearest', 'Antialiasing', false);
+% 
+% % Resizing image by factor 4 with imresize('nearest')
+% smaller_house_4_im_off = imresize(house, 0.25, 'nearest', 'Antialiasing', false);
+% 
+% % Resizing image by factor 8 with imresize('nearest')
+% smaller_house_7_im_off = imresize(house, 1/7, 'nearest', 'Antialiasing', false);
+% 
+% figure; 
+% imshow(smaller_house_2_im_off,[]);
+% set(gcf, 'Name', 'Imresize, nearest, antialiasing off faktor 2');
+% 
+% figure; 
+% imshow(smaller_house_4_im_off,[]);
+% set(gcf, 'Name', 'Imresize, nearest, antialiasing off faktor 4');
+% 
+% figure; 
+% imshow(smaller_house_7_im_off,[]);
+% set(gcf, 'Name', 'Imresize, nearest, antialiasing off faktor 7');
+% 
+% % Resizing image by factor 2 with imresize('nearest')
+% smaller_house_2_im_on = imresize(house, 0.5, 'nearest', 'Antialiasing', true);
+% 
+% % Resizing image by factor 4 with imresize('nearest')
+% smaller_house_4_im_on = imresize(house, 0.25, 'nearest', 'Antialiasing', true);
+% 
+% % Resizing image by factor 8 with imresize('nearest')
+% smaller_house_7_im_on = imresize(house, 1/7, 'nearest', 'Antialiasing', true);
+% 
+% figure; 
+% imshow(smaller_house_2_im_on,[]);
+% set(gcf, 'Name', 'Imresize, nearest, antialiasing on faktor 2');
+% 
+% figure; 
+% imshow(smaller_house_4_im_on,[]);
+% set(gcf, 'Name', 'Imresize, nearest, antialiasing on faktor 4');
+% 
+% figure; 
+% imshow(smaller_house_7_im_on,[]);
+% set(gcf, 'Name', 'Imresize, nearest, antialiasing on faktor 7');
+% 
+% %%%%%%%%%%%%%%%%%%
+% % Bicubic resize
+% 
+% % Resizing image by factor 2 with imresize('bicubic')
+% smaller_house_2_im_off = imresize(house, 0.5, 'bicubic', 'Antialiasing', false);
+% 
+% % Resizing image by factor 4 with imresize('bicubic')
+% smaller_house_4_im_off = imresize(house, 0.25, 'bicubic', 'Antialiasing', false);
+% 
+% % Resizing image by factor 8 with imresize('bicubic')
+% smaller_house_7_im_off = imresize(house, 1/7, 'bicubic', 'Antialiasing', false);
+% 
+% figure; 
+% imshow(smaller_house_2_im_off,[]);
+% set(gcf, 'Name', 'Imresize, bicubic, antialiasing off faktor 2');
+% 
+% figure; 
+% imshow(smaller_house_4_im_off,[]);
+% set(gcf, 'Name', 'Imresize, bicubic, antialiasing off faktor 4');
+% 
+% figure; 
+% imshow(smaller_house_7_im_off,[]);
+% set(gcf, 'Name', 'Imresize, bicubic, antialiasing off faktor 7');
+% 
+% 
+% % Resizing image by factor 2 with imresize('bicubic')
+% smaller_house_2_im_on = imresize(house, 0.5, 'bicubic', 'Antialiasing', true);
+% 
+% % Resizing image by factor 4 with imresize('bicubic')
+% smaller_house_4_im_on = imresize(house, 0.25, 'bicubic', 'Antialiasing', true);
+% 
+% % Resizing image by factor 8 with imresize('bicubic')
+% smaller_house_7_im_on = imresize(house, 1/7, 'bicubic', 'Antialiasing', true);
+% 
+% figure; 
+% imshow(smaller_house_2_im_on,[]);
+% set(gcf, 'Name', 'Imresize, bicubic, antialiasing on faktor 2');
+% 
+% figure; 
+% imshow(smaller_house_4_im_on,[]);
+% set(gcf, 'Name', 'Imresize, bicubic, antialiasing on faktor 4');
+% 
+% figure; 
+% imshow(smaller_house_7_im_on,[]);
+% set(gcf, 'Name', 'Imresize, bicubic, antialiasing on faktor 7');
+% disp('Second part of homework starts here')
+clear
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% 3. Removing motion blur
+% % Some methods are under comment section, result of these methods are
+% % explained in report. Only one of commented section can be uncommented
+% % while running script
+% disp('Third part of homework starts here')
+% % Reading blurred image
+% etf = double(imread('ulazne_slike/etf_blur.tif'));
+% 
+% % Reading motion 
+% motion = double(imread('ulazne_slike/kernel.tif'));
+% 
+% % Show input image
+% figure
+% imshow(etf,[])
+% set(gcf, 'Name', 'Ulazna zamucena slika, etf');
+% 
+% % Show motion
+% figure
+% imshow(motion,[]);
+% set(gcf, 'Name', 'Pokret');
+% 
+% %Size of input image
+% [M, N] = size(etf);
+% 
+% % Size for caclulating  spectrum
+% P = 2*M-1; Q = 2*N-1;
+% 
+% % Calculating spectrum of input image
+% etf_spectrum = fftshift(fft2(etf, P, Q));
+% 
+% % Calculating spectrum of motion
+% motion_spectrum = fftshift(fft2(motion, P, Q));
+% 
+% % Wiener filter
+% % Conastant for Wiener's filter
+% K = 1e-4;
+% W = (abs(motion_spectrum).^2)./(abs(motion_spectrum).^2 + K);
+% 
+% % Filtering
+% result_spectrum = (etf_spectrum./motion_spectrum).*W;
+% 
+% figure
+% imshow(log(1+abs(result_spectrum)),[]);
+% set(gcf, 'Name', 'Spektar slike nakon uklanjanja degradacije usled pokreta');
+% 
+% % Inverse fourirer transofrmation
+% result_estimate = ifft2(ifftshift(result_spectrum));
+% 
+% % Cutting image to right dimesnions
+% result_estimate = result_estimate(1:M, 1:N);
+% result_estimate = result_estimate(1:532, 1:800);
+% 
+% % Show image after removing motion blur
+% figure
+% imshow(result_estimate,[])
+% set(gcf, 'Name', 'Slika nakon uklanjanja degradacije usled pokreta');
+% 
+% % After Wiener's filter additional methods were used
+% 
+% %%%%%%%%%%%%%%%%%%%%%%
+% %1.Simple low pass filter
+% 
+% H = lpfilter('gaussian', P, Q, 150);
+% H = fftshift(H);
+% figure; 
+% imshow(log(1+abs(H)), []);
+% set(gcf, 'Name', 'Spektar koriscenog low pass filtra');
+% 
+% % Konvolucija u frek domenu
+% low_passed_spect = result_spectrum.*H;
+% figure; 
+% imshow(log(1+abs(low_passed_spect)), []);
+% set(gcf, 'Name', 'Spektar nakon filtriranja sa low pass filtrom');
+% low_passed_spatial = ifft2(ifftshift(low_passed_spect));
+% low_passed_spatial = low_passed_spatial(1:M, 1:N);
+% 
+% figure; 
+% imshow(low_passed_spatial(1:532, 1:800),[]);
+% set(gcf, 'Name', 'Slika nakon filtriranja sa low pass filtrom');
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%
+% %2. Adaptive local averaging
+% 
+% % Variance of noise , empirically calculated by finding unifrom polygon on
+% % image
+% nvar = 2.2484e-06;
+% low_pass_filter = fspecial('average', [7,7]);
+% gavg = imfilter(result_estimate, low_pass_filter, 'replicate');
+% gsqr_avg = imfilter(result_estimate.^2, low_pass_filter, 'replicate');
+% gvar = gsqr_avg - gavg.^2;
+% w = nvar./gvar;
+% w(w>1)=1;
+% result_averageg = result_estimate + w.*(gavg - result_estimate);
+% 
+% 
+% figure; 
+% imshow(result_averageg(1:532, 1:800),[]);
+% set(gcf, 'Name', 'Slika nakon filtriranja sa adaptivnim usrednjavanjem');
+
+% % %%%%%%%%%%%%%%%%%%%%%%%
+% % 3. Creating cross filter
+% % fil =zeros(P,Q);
+% % Widht of rectangles
+% % coeff=30;
+% % 
+% % Rectangle part
+% % fil((uint16(P/2)-coeff):(uint16(P/2)+coeff), uint16(Q/4):uint16(Q*3/4)) = 1;
+% % fil(uint16(P/4):uint16(P*3/4), uint16(Q/2)-coeff:(uint16(Q/2)+coeff)) = 1;
+% % 
+% % Gaussian in the middle
+% % H = lpfilter('gaussian', P, Q, 150);
+% % H = fftshift(H);
+% % 
+% % Creation of cross
+% % cross_filter = H +fil;
+% % cross_filter(cross_filter>1) = 1;
+% % 
+% % Show filter spectrum
+% % figure
+% % imshow(log(1+abs(cross_filter)),[]);
+% % set(gcf, 'Name', 'Custom krst filter');
+% % 
+% % Convolution
+% % cross_spectrum = result_spectrum.*cross_filter;
+% % 
+% % Show filtered spectrum
+% % figure
+% % imshow(log(1+abs(cross_spectrum)),[]);
+% % set(gcf, 'Name', 'Custom krst filter');
+% % 
+% % Inverse FFT 
+% % cross_spatial = ifft2(ifftshift(cross_spectrum));
+% % 
+% % figure
+% % imshow(cross_spatial(1:532, 1:800),[]);
+% % set(gcf, 'Name', 'Rezultat uklanja koriscenjem krst filtra');
+% % disp('Third part of homework ends here')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 4. Non local means
+% In this part of script, dos_non_local_means funcions is tested. Only one
+% call with chosen set of parametars is not commented because of duration
+% of function.
+disp('Last part of homework starts here')
+
+lena_noise = im2double(imread('ulazne_slike/lena_noise.tif'));
+lena_clean = im2double(imread('ulazne_slike/lena.tif'));
+
+var = 0.007;
+h = 0.06;
+K = [3, 5, 9];
+S = [15, 33, 51];
+
+displ('Loading 0%')
+
+% Function for call K=3 S=15
+result_K_3_S_15 = dos_non_local_means(lena_noise, K(1), S(1), var, h);
+psnr(result_K_3_S_15,lena_clean)
+displ('Loading 11%')
+
+% Function for call K=3 S=33
+result_K_3_S_33 = dos_non_local_means(lena_noise, K(1), S(2), var, h);
+psnr(result_K_3_S_33,lena_clean)
+displ('Loading 22%')
+
+% Function for call K=3 S=51
+result_K_3_S_51 = dos_non_local_means(lena_noise, K(1), S(3), var, h);
+psnr(result_K_3_S_51,lena_clean)
+displ('Loading 33%')
+
+% Function for call K=5 S=15
+result_K_5_S_15 = dos_non_local_means(lena_noise, K(2), S(1), var, h);
+psnr(result_K_5_S_15,lena_clean)
+displ('Loading 44%')
+
+% Function for call K=5 S=33
+result_K_5_S_33 = dos_non_local_means(lena_noise, K(2), S(2), var, h);
+psnr(result_K_3_S_33,lena_clean)
+displ('Loading 55%')
+
+% Function for call K=5 S=51
+result_K_5_S_51 = dos_non_local_means(lena_noise, K(2), S(3), var, h);
+psnr(result_K_5_S_51,lena_clean)
+displ('Loading 66%')
+
+% Function for call K=9 S=15
+result_K_9_S_15 = dos_non_local_means(lena_noise, K(3), S(1), var, h);
+psnr(result_K_9_S_15,lena_clean)
+displ('Loading 77%')
+
+% Function for call K=9 S=33
+result_K_9_S_33 = dos_non_local_means(lena_noise, K(3), S(2), var, h);
+psnr(result_K_9_S_33,lena_clean)
+displ('Loading 88%')
+
+% Function for call K=9 S=51
+result_K_9_S_51 = dos_non_local_means(lena_noise, K(3), S(3), var, h);
+psnr(result_K_9_S_51,lena_clean)
+displ('Loading 99%')
+displ('Loading 100%')
+
+
+
+
+disp('Homework ends here')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
